@@ -1,3 +1,4 @@
+// main.js
 import { searchFormImg } from './js/pixabay-api.js';
 import {
   showLoader,
@@ -17,25 +18,29 @@ const loadMoreBtn = document.querySelector('.load-more-btn');
 form.addEventListener('submit', handleSearch);
 loadMoreBtn.style.display = 'none';
 let page = 1;
-const limit = 15;
-const maxPages = 15;
+let currentQuery = '';
 
 async function handleSearch(event) {
   event.preventDefault();
   showLoader(loaderContainer);
 
   clearImagesGallery(ulGroup);
-
+  page = 1;
   const inputForm = form.elements.img.value.trim();
+  currentQuery = inputForm;
   try {
-    const images = await searchFormImg(inputForm, page, limit);
+    const images = await searchFormImg(inputForm, page, 15);
     if (images.length === 0) {
       loadMoreBtn.style.display = 'none';
       clearImagesGallery(ulGroup);
       searchError();
     } else {
       renderImages(images);
-      loadMoreBtn.style.display = 'block';
+      if (images.length < 15) {
+        loadMoreBtn.style.display = 'none';
+      } else {
+        loadMoreBtn.style.display = 'block';
+      }
     }
   } catch (error) {
     console.error(error);
@@ -61,28 +66,19 @@ async function clickNextSearch() {
   page++;
 
   try {
-    if (page > maxPages) {
-      searchInfo();
-      loadMoreBtn.style.display = 'none';
-      return;
-    }
-
-    const images = await searchFormImg(
-      form.elements.img.value.trim(),
-      page,
-      limit
-    );
+    const images = await searchFormImg(currentQuery, page);
     if (images.length === 0) {
       loadMoreBtn.style.display = 'none';
       searchInfo();
     } else {
       renderImages(images);
-      loadMoreBtn.style.display = 'block';
-
+      if (images.length < 15) {
+        loadMoreBtn.style.display = 'none';
+        searchInfo();
+      }
       const cardHeight = ulGroup
         .querySelector('.gallery-item')
         .getBoundingClientRect().height;
-
       window.scrollBy({
         top: cardHeight * 2,
         behavior: 'smooth',
