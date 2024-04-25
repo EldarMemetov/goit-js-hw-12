@@ -14,9 +14,11 @@ const loaderContainer = document.querySelector('.loader-container');
 const form = document.getElementById('form');
 const ulGroup = document.querySelector('.ul-group');
 const loadMoreBtn = document.querySelector('.load-more-btn');
+const backToTopBtn = document.querySelector('.back-to-top-btn');
 
 form.addEventListener('submit', handleSearch);
 loadMoreBtn.style.display = 'none';
+backToTopBtn.style.display = 'none';
 let page = 1;
 let currentQuery = '';
 
@@ -89,3 +91,18 @@ async function clickNextSearch() {
     searchError();
   }
 }
+
+window.addEventListener('scroll', () => {
+  if (window.scrollY > window.innerHeight) {
+    backToTopBtn.style.display = 'block';
+  } else {
+    backToTopBtn.style.display = 'none';
+  }
+});
+
+backToTopBtn.addEventListener('click', () => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
+});
